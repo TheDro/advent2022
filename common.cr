@@ -1,7 +1,5 @@
-puts "hello world"
 require "stumpy_png"
 include StumpyPNG
-
 
 def imagesc(img)
   maxVal = 1.0
@@ -17,10 +15,3 @@ def imagesc(img)
   StumpyPNG.write(canvas, "output1.png")
   canvas
 end
-
-img = [[0.1,0.8,0.1,0.9]]
-imagesc(img)
-
-# debugger
-
-puts "done"
