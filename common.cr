@@ -15,3 +15,21 @@ def imagesc(img)
   StumpyPNG.write(canvas, "output1.png")
   canvas
 end
+
+class Matrix(T)
+  private property content : Array(T)
+  getter dimensions = [1]
+  # private property dimensions = [1]
+
+  def initialize(default_value : T, *dimensions : Int32)
+    @dimensions = dimensions.to_a
+    @content = Array.new(dimensions.product, default_value)
+  end
+
+  def inspect
+    "#<#{self.class}:0x#{self.object_id.to_s(16)}, @dimensions=#{@dimensions.to_s}>"
+  end
+
+end
+
+puts "loaded common"
