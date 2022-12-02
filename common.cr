@@ -16,20 +16,61 @@ def imagesc(img)
   canvas
 end
 
-class Matrix(T)
-  private property content : Array(T)
-  getter dimensions = [1]
-  # private property dimensions = [1]
+# class Matrix(T)
+#   private property content : Array(T)
+#   getter dimensions = [1]
+#   # private property dimensions = [1]
 
-  def initialize(default_value : T, *dimensions : Int32)
-    @dimensions = dimensions.to_a
-    @content = Array.new(dimensions.product, default_value)
-  end
+#   def initialize(default_value : T, *dimensions : Int32)
+#     @dimensions = dimensions.to_a
+#     @content = Array.new(dimensions.product, default_value)
+#   end
 
-  def inspect
-    "#<#{self.class}:0x#{self.object_id.to_s(16)}, @dimensions=#{@dimensions.to_s}>"
-  end
+#   def inspect
+#     "#<#{self.class}:0x#{self.object_id.to_s(16)}, @dimensions=#{@dimensions.to_s}>"
+#   end
 
+# end
+
+# alias RecArray = Array(Int32) | Array(String) | Array(RecArray)
+
+# class MArray
+#   def initialize(@array : RecArray)
+#   end
+# end
+
+# bleh = MArray.new([[1,2,3],[4,5,6]].as(RecArray))
+
+# class Array2 < Array(Array(String) | Array(Int32))
+
+# end
+
+# class Array2(T)
+#   def initialize(@array : Array(Array(T)))
+#   end
+
+#   def [](i : Int32)
+#     super
+#   end
+
+#   delegate push, to: @array
+# end
+
+
+def parse_data(content : String, separator1)
+  content.split(separator1)
 end
+
+def parse_data(content : String, separator1, separator2)
+  content.split(separator1).map do |substring|
+    substring.split(separator2)
+  end
+end
+
+# def parse_other(content : String, separator1, separator2 = nil)
+#   content.split(separator1).map do |substring|
+#     separator2 ? substring.split(separator2) : substring
+#   end
+# end
 
 puts "loaded common"
