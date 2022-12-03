@@ -31,6 +31,5 @@ end
 puts total
 puts total2
 
-debugger
 
 puts "done"

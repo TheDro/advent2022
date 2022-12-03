@@ -17,6 +17,5 @@ top3 = totals.sort.reverse.first(3)
 puts top3
 puts top3.sum
 
-debugger
 
 puts "done"
