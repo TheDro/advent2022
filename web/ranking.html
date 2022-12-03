@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ranking</title>
+    <link rel="stylesheet" href="https://unpkg.com/marx-css/css/marx.min.css">
+    <style>
+      td, th {
+        padding: 0.5rem 0.25rem;
+      }
+    </style>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+  </head>
+  <body>
+
+
+    <div id="app">
+      <h1>Completion times</h1>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Score</th>
+            <th v-for="day of days">{{day}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="member of members">
+            <td>{{member.name}}</td>
+            <td>{{member.local_score}}</td>
+            <td v-for="day of days">{{formatHours(member.days[day-1])}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+    </div>
+
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    const {createApp} = Vue
+    const HOUR = 3600_000
+    let days = [...Array(25).keys()].map((i) => i+1)
+
+    fetch("/ranking.json").then((response) => response.json())
+    .then((data) => {
+      let orig_members = data.members
+      
+      members = remapMembers(orig_members).sort((member_a, member_b) => {
+        return member_b.local_score - member_a.local_score
+      })
+      window.members = members
+
+      createApp({
+        data() {
+          return {members, days}
+        },
+        methods: {
+          formatHours(hours) {
+            if (!hours) return 'NaN'
+            return hours.map((hour) => {
+              let h = Math.floor(hour)
+              let m = Math.round((hour-h)*60)
+              m = ("0"+m).slice(-2)
+              return `${h}h${m}`
+            }).join(', ')
+          }
+        }
+      }).mount('#app')
+    })
+
+
+    // {name: "Andrew", local_score: 171, days: [[0.93, 0.96],[6.151, 6.477],...]}
+    function remapMembers(members) {
+      let days = [...Array(25).keys()].map((i) => i+1)
+      memberData = Object.values(members).map((member) => {
+        data = {
+          name: member.name,
+          local_score: member.local_score,
+          days: []
+        }
+        days.forEach((day) => {
+          let dayStart = new Date(`2022-12-${('0'+day).slice(-2)}T05:00:00Z`)
+          let completions = member.completion_day_level[day]
+          if (!completions) {
+            data.days.push([0,0])
+            return
+          }
+          completions = Object.values(completions)
+          let completionTimes = completions.map((completion) => {
+            return (completion.get_star_ts*1000 - dayStart.valueOf())/HOUR
+          })
+          completionTimes.push(0)
+          data.days.push(completionTimes.slice(0,2))
+        })
+        return data
+      })
+
+      return memberData
+    }
+
+
+  </script>
+  </body>
+</html>
