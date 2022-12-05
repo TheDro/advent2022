@@ -67,6 +67,10 @@ def parse_data(content : String, separator1, separator2)
   end
 end
 
+def deep_dup(array : Array(Array))
+  array.map(&.dup)
+end
+
 # def parse_other(content : String, separator1, separator2 = nil)
 #   content.split(separator1).map do |substring|
 #     separator2 ? substring.split(separator2) : substring
