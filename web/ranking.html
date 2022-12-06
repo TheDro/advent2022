@@ -10,6 +10,9 @@
       td, th {
         padding: 0.5rem 0.25rem;
       }
+      th {
+        cursor: pointer;
+      }
     </style>
     <!-- <link rel="stylesheet" href="style.css"> -->
   </head>
@@ -22,9 +25,9 @@
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Score</th>
-            <th v-for="day of days">{{day}}</th>
+            <th @click="sortBy('name')">Name</th>
+            <th @click="sortBy('-local_score')">Score</th>
+            <th v-for="day of days" @click="sortBy(day)">{{day}}</th>
           </tr>
         </thead>
         <tbody>
@@ -61,13 +64,26 @@
         },
         methods: {
           formatHours(hours) {
-            if (!hours) return 'NaN'
+            if (!hours || !hours[0]) return ''
             return hours.map((hour) => {
               let h = Math.floor(hour)
               let m = Math.round((hour-h)*60)
               m = ("0"+m).slice(-2)
               return `${h}h${m}`
             }).join(', ')
+          },
+          sortBy(col) {
+            if (typeof col === 'number') {
+              this.members = this.members.sort((a, b) => {
+                let dayA = a.days[col-1][0] 
+                let dayB = b.days[col-1][0]
+                if (dayA === 0) dayA = 9999
+                if (dayB === 0) dayB = 9999
+                return dayA-dayB
+              })
+            } else {
+              this.members = sortArray(this.members, col)
+            }
           }
         }
       }).mount('#app')
@@ -102,6 +118,27 @@
 
       return memberData
     }
+
+    function sortArray(array, key) {
+      let invert = 1
+      if (key[0] === "-") {
+        invert = -1
+        key = key.slice(1)
+      }
+
+      return array.sort(function(a, b) {
+        let valueA = a[key]
+        let valueB = b[key]
+        if (valueA < valueB) {
+          return -invert
+        } else if (valueA > valueB) {
+          return invert
+        } else {
+          return 0
+        }
+      })
+    }
+
 
 
   </script>
