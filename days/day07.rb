@@ -52,7 +52,6 @@ def parse_folders
   cursor = root
   all_folders.push(root)
   $commands.each do |command|
-    # binding.pry
     if command == "$ cd /"
       puts "move to /"
       cursor = root
@@ -97,7 +96,6 @@ def part2(folders)
   smaller_sizes = sizes.filter{|size| size < required_space }
   puts "required space: #{required_space}"
   puts "part2: #{sizes[smaller_sizes.length]}"
-  binding.pry
   smaller_sizes.last
 end
 
