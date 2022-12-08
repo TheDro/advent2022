@@ -41,6 +41,18 @@ class Matrix
     return array[*args]
   end
 
+  def []=(*args)
+    if args.size == 2 && (args[0].is_a?(Array) || args[0].is_a?(Matrix))
+      new_value = args[1]
+      result = array
+      args[0][0..-2].each do |i|
+        result = result&.[](i)
+      end
+      return result[args[0][-1]] = new_value
+    end
+    return array.[]=(*args)
+  end
+
   def *(number)
     result = self.dup
     size = result.size
@@ -87,7 +99,11 @@ class Matrix
         result = Array.new(i) { deep_dup(result) }
       end
     end
-    result
+    Matrix.new(result)
+  end
+
+  def self.test
+    Matrix.new([[1,2,3],[4,5,6]])
   end
 
   private
