@@ -1,3 +1,9 @@
+require 'pry'
+
+def deep_dup(object)
+  Marshal.load(Marshal.dump(object))
+end
+
 
 class Matrix
   attr_accessor :array
@@ -24,8 +30,64 @@ class Matrix
     end
   end
 
+  def [](*args)
+    if args.size == 1 && (args[0].is_a?(Array) || args[0].is_a?(Matrix))
+      result = array
+      args[0].each do |i|
+        result = result&.[](i)
+      end
+      return result
+    end
+    return array[*args]
+  end
+
+  def *(number)
+    result = self.dup
+    size = result.size
+    size[0].times do |i|
+      if size[1]
+        size[1].times do |j|
+          result[i][j] = result[i][j] * number
+        end
+      else
+        result[i] = result[i] * number
+      end
+    end
+    result
+  end
+
+  def +(other)
+    result = self.dup
+    size[0].times do |i|
+      if size[1]
+        size[1].times do |j|
+          result[i][j] = result[i][j] + other[i][j]
+        end
+      else
+        result[i] = result[i] + other[i]
+      end
+    end
+    result
+  end
+
+  def dup
+    Marshal.load(Marshal.dump(self))
+  end
+
   def method_missing(m, ...)
     array.send(m, ...)
+  end
+
+  def self.zeros(size)
+    result = nil
+    size.reverse.each do |i|
+      if result.nil?
+        result = Array.new(i, 0)
+      else
+        result = Array.new(i) { deep_dup(result) }
+      end
+    end
+    result
   end
 
   private
@@ -44,8 +106,20 @@ class Matrix
   end
 end
 
+class Vectors
 
+  def self.range(first, delta, last=nil)
+    result = Enumerator.new do |y|
+      cursor = Matrix.new(first)
+      loop do
+        y << cursor.to_a
+        cursor = cursor+delta
+      end
+    end
+    result
+  end
 
+end
 
 
 def parse_data(content, separator1, separator2=nil)
