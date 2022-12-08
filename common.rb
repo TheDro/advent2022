@@ -9,7 +9,11 @@ class Matrix
   attr_accessor :array
 
   def initialize(array)
-    @array = array
+    if array.is_a?(Matrix)
+      @array = deep_dup(array.array)
+    else
+      @array = array
+    end
   end
 
   def size(n=nil)
