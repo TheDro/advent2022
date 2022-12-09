@@ -6,14 +6,10 @@ content = File.read("./days/day08.data")
 
 
 def update_visibility(start, dir1, dir2)
-  start = Matrix.new(start)
-  Vectors.range([0,0],dir1).each do |i|
-    break if $trees[i].nil?
-    i = start+i
+  bounds = Matrix.new($trees.size)-[1,1]
+  Vectors.range(start,dir1,bounds).each do |i|
     max_height = -1
-    Vectors.range([0,0],dir2).each do |j|
-      pos = i+j
-      break if $trees[pos].nil?
+    Vectors.range(i,dir2,bounds).each do |pos|
       if $trees[pos] > max_height
         max_height = $trees[pos]
         $visible[pos] = 1
@@ -21,7 +17,6 @@ def update_visibility(start, dir1, dir2)
     end
   end
 end
-
 
 
 def part1

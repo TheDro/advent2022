@@ -169,14 +169,14 @@ class Vectors
   # bounds are inclusive
   def self.range(first, delta, bounds=nil)
     result = Enumerator.new do |y|
-      cursor = Matrix.new(first).dup
+      cursor = first.dup
       if bounds
         catch :out_of_bounds do
           loop do
             throw :out_of_bounds if cursor.min < 0
-            throw :out_of_bounds if (cursor-bounds).max > 0
-            y << cursor.to_a
-            cursor.add!(delta)
+            throw :out_of_bounds if (cursor.zip(bounds).map{|a,b| a-b}).max > 0
+            y << cursor
+            cursor = cursor.zip(delta).map{|a,b| a+b}
           end
         end
       else
@@ -218,37 +218,37 @@ def parse_data(content, separator1, separator2=nil)
   end
 end
 
-def test
-  n = 500 
-  mat = Matrix.ones([n,n])
-  tic
-  total = 0
-  Vectors.range([0,0],[0,1],[n-1,n-1]).each do |i|
-    Vectors.range(i,[1,0],[n-1,n-1]).each do |pos|
-      total += mat[pos]
-    end
-  end
-  puts "  #{total}"
-  toc # n=500: 4.6, 5.1, 2.7, 2.6 ?? 3.2, 2.9
-end
+# def test
+#   n = 500 
+#   mat = Matrix.ones([n,n])
+#   tic
+#   total = 0
+#   Vectors.range([0,0],[0,1],[n-1,n-1]).each do |i|
+#     Vectors.range(i,[1,0],[n-1,n-1]).each do |pos|
+#       total += mat[pos]
+#     end
+#   end
+#   puts "  #{total}"
+#   toc # n=500: 4.6, 5.1, 2.7, 2.6 ?? 3.2, 2.9, 0.54
+# end
 
-def test2
-  n = 500 
-  mat = Matrix.ones([n,n])
-  tic
-  total = 0
-  n.times do |i|
-    n.times do |j|
-      total += mat[i][j]
-    end
-  end
-  puts "  #{total}"
-  toc # n=500: 
-end
+# def test2
+#   n = 500 
+#   mat = Matrix.ones([n,n])
+#   tic
+#   total = 0
+#   n.times do |i|
+#     n.times do |j|
+#       total += mat[i][j]
+#     end
+#   end
+#   puts "  #{total}"
+#   toc # n=500: 0.11
+# end
 
-test
-test
-test
-test2
-test2
-test2
+# test
+# test
+# test
+# test2
+# test2
+# test2
