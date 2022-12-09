@@ -72,8 +72,9 @@ class Matrix
     result
   end
 
-  def +(other)
-    result = self.dup
+
+  def add!(other)
+    result = self
     size[0].times do |i|
       if size[1]
         size[1].times do |j|
@@ -81,6 +82,24 @@ class Matrix
         end
       else
         result[i] = result[i] + other[i]
+      end
+    end
+    result
+  end
+
+  def +(other)
+    self.dup.add!(other)
+  end
+
+  def -(other)
+    result = self.dup
+    size[0].times do |i|
+      if size[1]
+        size[1].times do |j|
+          result[i][j] = result[i][j] - other[i][j]
+        end
+      else
+        result[i] = result[i] - other[i]
       end
     end
     result
@@ -95,15 +114,11 @@ class Matrix
   end
 
   def self.zeros(size)
-    result = nil
-    size.reverse.each do |i|
-      if result.nil?
-        result = Array.new(i, 0)
-      else
-        result = Array.new(i) { deep_dup(result) }
-      end
-    end
-    Matrix.new(result)
+    same_values(size, 0)
+  end
+
+  def self.ones(size)
+    same_values(size, 1)
   end
 
   def self.test
@@ -111,6 +126,18 @@ class Matrix
   end
 
   private
+
+  def self.same_values(size, value)
+    result = nil
+    size.reverse.each do |i|
+      if result.nil?
+        result = Array.new(i, value)
+      else
+        result = Array.new(i) { deep_dup(result) }
+      end
+    end
+    Matrix.new(result)
+  end
 
   def get_indexes(n, size)
     result = []
@@ -127,13 +154,24 @@ class Matrix
 end
 
 class Vectors
-
-  def self.range(first, delta, last=nil)
+  # bounds are inclusive
+  def self.range(first, delta, bounds=nil)
     result = Enumerator.new do |y|
-      cursor = Matrix.new(first)
-      loop do
-        y << cursor.to_a
-        cursor = cursor+delta
+      cursor = Matrix.new(first).dup
+      if bounds
+        catch :out_of_bounds do
+          loop do
+            throw :out_of_bounds if cursor.min < 0
+            throw :out_of_bounds if (cursor-bounds).max > 0
+            y << cursor.to_a
+            cursor.add!(delta)
+          end
+        end
+      else
+        loop do
+          y << cursor.to_a
+          cursor = cursor + delta
+        end
       end
     end
     result
@@ -141,9 +179,65 @@ class Vectors
 
 end
 
+class Timer
+  def self.tic
+    @@tic = Time.now
+  end
+  def self.toc
+    result = Time.now - @@tic
+    @@tic = Time.now
+    puts result
+    result
+  end
+end
+
+
+def tic
+  Timer.tic
+end
+
+def toc
+  Timer.toc
+end
 
 def parse_data(content, separator1, separator2=nil)
   content.split(separator1).map do |substring|
     separator2 ? substring.split(separator2) : substring
   end
 end
+
+def test
+  n = 500 
+  mat = Matrix.ones([n,n])
+  tic
+  total = 0
+  Vectors.range([0,0],[0,1],[n-1,n-1]).each do |i|
+    Vectors.range(i,[1,0],[n-1,n-1]).each do |pos|
+      # total += mat[pos]
+      total += mat[pos[0]][pos[1]]
+    end
+  end
+  puts "  #{total}"
+  toc # n=500: 4.6, 5.1, 2.7, 2.6 ?? 3.2
+end
+
+def test2
+  n = 500 
+  mat = Matrix.ones([n,n])
+  tic
+  total = 0
+  n.times do |i|
+    n.times do |j|
+      total += mat[i][j]
+    end
+  end
+  puts "  #{total}"
+  toc # n=500: 
+end
+
+test
+test
+test
+test2
+test2
+test2

@@ -39,7 +39,7 @@ def visible_trees(pos, dir)
   pos = Matrix.new(pos)
   height = $trees[pos]
   total = 0
-  Vectors.range((pos+dir).to_a,dir).each do |x|
+  Vectors.range(pos+dir,dir).each do |x|
     break if $trees[x].nil? || x.min < 0
     if $trees[x] >= height
       total += 1
