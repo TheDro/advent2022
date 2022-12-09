@@ -224,17 +224,17 @@ def dd
   load 'days/day09.rb'
 end
 
-def setup(today)
+def setup(today = Time.now.day)
   # copy file from one location to another
   yesterday = today-1
-  yesterday_name = "day0#{yesterday}"[-2..]
-  today_name = "day0#{today}"[-2..]
+  yesterday_name = "day" + "0#{yesterday}"[-2..]
+  today_name = "day" + "0#{today}"[-2..]
   yesterday_filename = "./days/#{yesterday_name}.rb"
   today_filename = "./days/#{today_name}.rb"
-  if !File.exists(today_filename)
+  if !File.exists?(today_filename)
     FileUtils.cp(yesterday_filename, today_filename)
-    FileUtils.touch("./#{today_name}.data")
-    FileUtils.touch("./#{today_name}.test.data")
+    FileUtils.touch("./days/#{today_name}.data")
+    FileUtils.touch("./days/#{today_name}.test.data")
   end
 end
 
