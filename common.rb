@@ -1,4 +1,5 @@
 require 'pry'
+# irb -r ./common.rb
 
 def deep_dup(object)
   Marshal.load(Marshal.dump(object))
@@ -217,6 +218,12 @@ def parse_data(content, separator1, separator2=nil)
     separator2 ? substring.split(separator2) : substring
   end
 end
+
+
+def dd
+  load 'days/day09.rb'
+end
+
 
 # def test
 #   n = 500 

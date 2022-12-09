@@ -1,6 +1,5 @@
 require 'pry'
 load 'common.rb'
-# load './days/day08.rb'
 content = File.read("./days/day09.data")
 # content = File.read("./days/day09.test.data")
 $moves = parse_data(content,"\n"," ")
@@ -32,7 +31,7 @@ def part1
       end
     end
   end
-
+  $visited.size
 end
 
 def part2
@@ -46,7 +45,6 @@ def part2
     n.to_i.times do |i|
       previous_position = $knots[0]
       $knots[0] = $knots[0] + dir
-      puts "moving head to: #{$knots[0].join(',')}"
       (1..n_knots-1).each do |i_knot|
         next_move = get_next_move($knots[i_knot-1], $knots[i_knot])
         $knots[i_knot] = $knots[i_knot] + next_move
@@ -54,7 +52,7 @@ def part2
       end
     end
   end
-
+  $visited.size
 end
 
 def get_next_move(head,tail)
@@ -65,8 +63,5 @@ def get_next_move(head,tail)
   end
 end
 
-# part1
-# puts "part1: #{$visited.count}"
-part2
-# part1
-# part2
+puts part1
+puts part2
