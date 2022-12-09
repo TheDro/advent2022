@@ -75,34 +75,46 @@ class Matrix
 
   def add!(other)
     result = self
-    size[0].times do |i|
-      if size[1]
-        size[1].times do |j|
-          result[i][j] = result[i][j] + other[i][j]
-        end
-      else
-        result[i] = result[i] + other[i]
+
+    if self.size.size == 1
+      result.array = result.array.zip(other).map do |a,b|
+        a + b
       end
+      return result
+    else
+      result.array = result.array.zip(other).map do |row_a, row_b|
+        row_a.zip(row_b).map do |a,b|
+          a + b
+        end
+      end
+      return result
     end
-    result
   end
 
   def +(other)
     self.dup.add!(other)
   end
 
-  def -(other)
-    result = self.dup
-    size[0].times do |i|
-      if size[1]
-        size[1].times do |j|
-          result[i][j] = result[i][j] - other[i][j]
-        end
-      else
-        result[i] = result[i] - other[i]
+  def subtract!(other)
+    result = self
+
+    if self.size.size == 1
+      result.array = result.array.zip(other).map do |a,b|
+        a - b
       end
+      return result
+    else
+      result.array = result.array.zip(other).map do |row_a, row_b|
+        row_a.zip(row_b).map do |a,b|
+          a - b
+        end
+      end
+      return result
     end
-    result
+  end
+
+  def -(other)
+    self.dup.subtract!(other)
   end
 
   def dup
@@ -213,12 +225,11 @@ def test
   total = 0
   Vectors.range([0,0],[0,1],[n-1,n-1]).each do |i|
     Vectors.range(i,[1,0],[n-1,n-1]).each do |pos|
-      # total += mat[pos]
-      total += mat[pos[0]][pos[1]]
+      total += mat[pos]
     end
   end
   puts "  #{total}"
-  toc # n=500: 4.6, 5.1, 2.7, 2.6 ?? 3.2
+  toc # n=500: 4.6, 5.1, 2.7, 2.6 ?? 3.2, 2.9
 end
 
 def test2
