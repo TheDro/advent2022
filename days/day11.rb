@@ -6,6 +6,8 @@ $monkey_data = parse_data(content,"\n\n")
 
 class Monkey
 
+  attr_reader :divisible
+
   def initialize(data)
     parse(data)
   end
@@ -53,7 +55,8 @@ class Monkey
     elsif @operation[0] == "*"
       result *= argument
     end
-    (result/3).floor
+    # (result/3).floor
+    result % $prime_factor
   end
 
 end
@@ -61,8 +64,11 @@ end
 def reset
   puts "reset monkeys"
   $inspections = Array.new($monkey_data.size){0}
+  $prime_factor = 1
   $monkeys = $monkey_data.map do |data|
-    Monkey.new(data)
+    monkey = Monkey.new(data)
+    $prime_factor *= monkey.divisible
+    monkey
   end
 end
 
@@ -72,13 +78,22 @@ def run_rounds(n=1)
       monkey.run
     end
   end
+  puts $inspections.join(' ')
 end
 
 reset()
 
-def part1
+# def part1
+#   reset()
+#   run_rounds(20)
+#   result = $inspections.sort[-2..].reduce(1) { |prod, x| x*prod }
+#   puts "part1: #{result}"
+# end
+
+def part2
   reset()
-  run_rounds(20)
+  run_rounds(10000)
   result = $inspections.sort[-2..].reduce(1) { |prod, x| x*prod }
-  puts "part1: #{result}"
+  puts "part2: #{result}"
 end
+
