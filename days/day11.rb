@@ -55,7 +55,7 @@ class Monkey
     elsif @operation[0] == "*"
       result *= argument
     end
-    # (result/3).floor
+    # (result/3).floor # needed for part 1
     result % $prime_factor
   end
 
