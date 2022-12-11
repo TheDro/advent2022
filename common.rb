@@ -1,4 +1,5 @@
 require 'pry'
+require 'pry-nav'
 # irb -r ./common.rb
 
 def deep_dup(object)
@@ -221,7 +222,7 @@ end
 
 
 def dd
-  load 'days/day10.rb'
+  load 'days/day11.rb'
 end
 
 def setup(today = Time.now.day)
