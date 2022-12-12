@@ -1,5 +1,6 @@
 require 'pry'
 require 'pry-nav'
+require 'chunky_png'
 # irb -r ./common.rb
 
 def deep_dup(object)
@@ -123,6 +124,10 @@ class Matrix
     Marshal.load(Marshal.dump(self))
   end
 
+  def to_m
+    self
+  end
+
   def method_missing(m, ...)
     array.send(m, ...)
   end
@@ -193,6 +198,12 @@ class Vectors
 
 end
 
+class Array
+  def to_m
+    Matrix.new(self)
+  end
+end
+
 class Timer
   def self.tic
     @@tic = Time.now
@@ -222,7 +233,7 @@ end
 
 
 def dd
-  load 'days/day11.rb'
+  load 'days/day12.rb'
 end
 
 def setup(today = Time.now.day)
@@ -237,6 +248,21 @@ def setup(today = Time.now.day)
     FileUtils.touch("./days/#{today_name}.data")
     FileUtils.touch("./days/#{today_name}.test.data")
   end
+end
+
+
+def imagesc(img, number = 0)
+  img = img.to_m
+  max_value = img.map(&:max).max
+  scale = 255.0/max_value
+  png = ChunkyPNG::Image.new(img.size[1], img.size[0], ChunkyPNG::Color::TRANSPARENT)
+  img.each_with_index do |row, i|
+    row.each_with_index do |value, j|
+      color = (value*scale).round
+      png[j,i] = ChunkyPNG::Color.rgba(color, color, color, 255)
+    end
+  end
+  png.save("./days/output#{number}.png")
 end
 
 
