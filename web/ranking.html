@@ -67,10 +67,10 @@
             if (!hours || !hours[0]) return ''
             return hours.map((hour) => {
               let h = Math.floor(hour)
-              let m = Math.round((hour-h)*60)
-              m = ("0"+m).slice(-2)
-              return `${h}h${m}`
-            }).join(', ')
+              let m = ("0" + Math.floor((hour%1)*60)).slice(-2)
+              let s = ("0" + Math.floor(((hour*60)%1)*60)).slice(-2)
+              return `${h}:${m}:${s}`
+            }).join(', \n')
           },
           sortBy(col) {
             if (typeof col === 'number') {
