@@ -172,9 +172,11 @@ class Matrix
   end
 end
 
-class Vectors
+module Vectors
+  extend self
+
   # bounds are inclusive
-  def self.range(first, delta, bounds=nil)
+  def range(first, delta, bounds=nil)
     result = Enumerator.new do |y|
       cursor = first.dup
       if bounds
@@ -188,8 +190,8 @@ class Vectors
         end
       else
         loop do
-          y << cursor.to_a
-          cursor = cursor + delta
+          y << cursor
+          cursor = cursor.zip(delta).map{|a,b| a+b}
         end
       end
     end
