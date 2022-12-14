@@ -25,8 +25,8 @@ end
 
 def generate_sandbox(walls)
   max_x = 0
-  min_y = 1000
-  max_y = 0
+  min_y = 300
+  max_y = 700
 
   walls.each do |wall|
     max_x = [max_x, wall[0][0], wall[1][0]].max
@@ -55,7 +55,7 @@ def generate_sandbox(walls)
   [[[0, max_x], [min_y, max_y]], sand]
 end
 
-def part1(sand=$sand, source=$source, n: 1)
+def part1(n=1000, sand=$sand, source=$source)
   sand = sand.dup
   limits = sand.size.to_m-[1,1]
   n.times do |i|
@@ -80,6 +80,37 @@ def part1(sand=$sand, source=$source, n: 1)
   imagesc(sand)
 end
 
+def part2(n=1e6.to_i, sand=$sand, source=$source)
+  sand = sand.dup
+  limits = sand.size.to_m-[1,1]
+  n.times do |i|
+    cursor = Matrix.new(source.dup)
+    1000.times do
+      if sand[cursor + [1,0]] == 0
+        cursor += [1,0]
+      elsif sand[cursor + [1,-1]] == 0
+        cursor += [1,-1]
+      elsif sand[cursor + [1,1]] == 0
+        cursor += [1,1]
+      else
+        sand[cursor] = 2
+        if cursor[0] == source[0] && cursor[1] == source[1]
+          return i+1
+        end
+        break
+      end
+      if cursor[0] == limits[0] || cursor[1] == 0 || cursor[1] == limits[1]
+        sand[cursor] = 2
+      end
+    end
+    # if (i != 0 && i%5000 == 0)
+    #   imagesc(sand)
+    #   binding.pry
+    # end
+  end
+  imagesc(sand)
+end
+
 # def part2(sand=$sand, source=$source, n: 1)
 
 
@@ -88,6 +119,6 @@ end
 
 $range, $sand = generate_sandbox($walls)
 $source = [0, 500-$range[1][0]]
-part1
+# part1
 
 
