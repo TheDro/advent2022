@@ -128,6 +128,10 @@ class Matrix
     self
   end
 
+  def inspect
+    "#<Matrix:#{object_id} size=#{self.size}>"
+  end
+
   def method_missing(m, ...)
     array.send(m, ...)
   end
@@ -235,7 +239,7 @@ end
 
 
 def dd
-  load 'days/day13.rb'
+  load 'days/day14.rb'
 end
 
 def setup(today = Time.now.day)
