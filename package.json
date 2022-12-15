@@ -1,0 +1,28 @@
+{
+  "name": "advent2022",
+  "version": "1.0.0",
+  "description": "This repo contains my solutions to the Advent of Code challenges in 2022. My goal is to take this opportunity to learn Crystal. Let's do this!",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "serve": "^14.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "days": "serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheDro/advent2022.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheDro/advent2022/issues"
+  },
+  "homepage": "https://github.com/TheDro/advent2022#readme"
+}
