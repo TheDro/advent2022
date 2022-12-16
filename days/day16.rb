@@ -1,7 +1,7 @@
 load 'common.rb'
 require 'json'
 content = File.read("./days/day16.data")
-content = File.read("./days/day16.test.data")
+# content = File.read("./days/day16.test.data")
 $data = parse_data(content,"\n")
 
 Valve = Struct.new(:name, :flow, :connections, :distances)
@@ -25,23 +25,32 @@ def update_distances(starting_valve)
   distances.keys.each do |key|
     distances[key] = distances[key] + 1
   end
+  distances = distances.filter do |name, d|
+    $valves[name].flow > 0
+  end
+
   starting_valve.distances = distances
 end
 
 
 def explore(n, valve=$valves["AA"])
+  tic
   $visited = {}
   $starting_flow = $valves.values.reduce(0) do |total, valve|
     total + valve.flow
   end
 
   moves = [Path.new(valve, cost: 0, time: 0, previous: nil)]
-
+  largest_time = 0
   while !moves.empty? do
     # binding.pry
     path = moves.shift
     if path.time > n
       next
+    end
+    if path.time > largest_time
+      largest_time = path.time
+      puts "time: #{largest_time}"
     end
     # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
     # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
@@ -51,7 +60,7 @@ def explore(n, valve=$valves["AA"])
       $visited[path.key] = path
       distances = path.valve.distances
       new_paths = distances.filter do |name, d|
-        !path.visited.include?(name)
+        !path.visited.include?(name) && path.time+d <= n
       end.map do |name, d|
         cost = path.cost + d*path.flow
         next_flow = path.flow - $valves[name].flow
@@ -67,7 +76,7 @@ def explore(n, valve=$valves["AA"])
     end
 
   end
-
+  toc
   $results = deep_dup($visited)
   $results.values.each do |path|
     delta = n-path.time
@@ -99,7 +108,7 @@ class Path
   # end
 
   def key
-    @visited.to_a.sort.join(',')
+    @time.to_s + ":" + @visited.to_a.sort.join(',')
   end
 
   def inspect
@@ -125,5 +134,11 @@ $valves.values.each do |valve|
   update_distances(valve)
 end
 
-explore(30)
+# explore(30)
 
+def part1
+  result = explore(30)[0]
+  puts "#{$starting_flow*30-result.cost}"
+end
+
+# part1
