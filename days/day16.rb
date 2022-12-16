@@ -43,15 +43,25 @@ def explore(n, valve=$valves["AA"])
     if path.time > n
       next
     end
+    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
+    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
+    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH,EE"
+    # binding.pry if paths.key == "AA,BB,CC,DD,EE,HH,JJ"
     if !$visited[path.key] || $visited[path.key].cost > path.cost
       $visited[path.key] = path
       distances = path.valve.distances
-      new_paths = distances.map do |name, d|
+      new_paths = distances.filter do |name, d|
+        !path.visited.include?(name)
+      end.map do |name, d|
         cost = path.cost + d*path.flow
         next_flow = path.flow - $valves[name].flow
         time = path.time + d
         Path.new($valves[name], time: time, cost: cost, flow: next_flow, previous: path)
       end
+      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
+      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
+      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH,EE"
+      # binding.pry if paths.key == "AA,BB,CC,DD,EE,HH,JJ"
       moves.concat(new_paths)
       moves = moves.sort_by{|path| path.cost}
     end
@@ -65,7 +75,7 @@ def explore(n, valve=$valves["AA"])
     path.cost += delta*path.flow
   end
   $results = $results.values.sort_by{|path| path.cost}
-  $results.first(40)
+  $results.first(100)
 end
 
 
@@ -115,5 +125,5 @@ $valves.values.each do |valve|
   update_distances(valve)
 end
 
-explore(3)
+explore(30)
 
