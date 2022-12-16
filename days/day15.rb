@@ -15,8 +15,10 @@ $beacons = $beacons.uniq
 
 def count_row(x, sensors = $sensors)
   ranges = get_ranges(x, sensors)
-  coverage = get_coverage(ranges)
-  binding.pry
+  reduced_ranges = reduce_ranges(ranges)
+  coverage = reduced_ranges.reduce(0) do |sum, range|
+    sum + (range[1]-range[0]+1)
+  end
   coverage - $beacons.filter{|b| b[0] == x}.size
 end
 
@@ -31,11 +33,10 @@ def get_ranges(x, sensors = $sensors)
       result.push(nil)
     end
   end
-  pp result
   result.compact
 end
 
-def get_coverage(orig_ranges)
+def reduce_ranges(orig_ranges)
   ranges = deep_dup(orig_ranges)
   result = []
   ranges.size.times do |i|
@@ -51,29 +52,44 @@ def get_coverage(orig_ranges)
         next
       end
       if overlap?(ranges[i], ranges[j])
-        puts "overlap: #{ranges[i]} #{ranges[j]}"
         ranges[i] = [ [ranges[i][0], ranges[j][0]].min , [ranges[i][1], ranges[j][1]].max ]
         ranges[j] = nil
-        puts "result: #{ranges[i]}"
         j = 0
         next
       end
       j += 1
     end
   end
-  binding.pry
   separate_ranges = ranges.compact
-
-  separate_ranges.reduce(0) do |sum, range|
-    sum + (range[1]-range[0]+1)
-  end
 end
 
 def overlap?(a, b)
-  (a[0] <= b[0] && b[0] <= a[1]) || (a[0] <= b[1] && b[1] <= a[1])
+  (a[0] <= b[0] && b[0] <= a[1]+1) || (a[0]-1 <= b[1] && b[1] <= a[1])
+end
+
+def part2(max_value=4e6.to_i, sensors=$sensors)
+  tic
+  (0..max_value).each do |x|
+    ranges = get_ranges(x, sensors)
+    reduced_ranges = reduce_ranges(ranges)
+    if reduced_ranges.size == 2
+      correct_ranges = reduced_ranges.sort_by { |a| a[0] }
+      y = correct_ranges[0][1]+1
+      puts "part2: y=#{x}, x=#{y}"
+      puts "frequency: #{y*4_000_000 + x}"
+      toc
+      return y*4_000_000 + x
+    end
+    if x%10_000 == 0
+      puts x
+    end
+    # puts reduced_ranges.size
+  end
+  toc
 end
 
 
 # part1
 # puts count_row(10)
-puts count_row(2000000) # 6217513 is too large
+# puts count_row(2000000) # 6217513 is too large
+puts part2(4_000_000)
