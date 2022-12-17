@@ -37,80 +37,48 @@ end
 def explore(n, valve=$valves["AA"])
   tic
   $visited = {}
-  $starting_flow = $valves.values.reduce(0) do |total, valve|
-    total + valve.flow
-  end
 
-  moves = [Path.new(valve, cost: 0, time: 0, previous: nil)]
-  largest_time = 0
-  lowest_total_cost = $starting_flow*n
-  puts lowest_total_cost
+  moves = [Path.new(valve, released: 0, time: 0, previous: nil)]
   while !moves.empty? do
     # binding.pry
+
     path = moves.shift
-    # if path.time > n
-    #   next
-    # end
-    # if path.time > largest_time
-    #   largest_time = path.time
-    #   # puts "time: #{largest_time}"
-    # end
-
-    if path.cost > lowest_total_cost
-      next
-    end
-
-    next_total_cost = path.cost + (n-path.time)*path.flow
-    if next_total_cost < lowest_total_cost
-      lowest_total_cost = next_total_cost
-      puts $starting_flow*n - lowest_total_cost
-    end
-
     
-    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
-    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
-    # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH,EE"
-    # binding.pry if paths.key == "AA,BB,CC,DD,EE,HH,JJ"
-    if !$visited[path.key] || $visited[path.key].cost > path.cost
+    if !$visited[path.key] || $visited[path.key].released < path.released
       $visited[path.key] = path
       distances = path.valve.distances
       new_paths = distances.filter do |name, d|
         !path.visited.include?(name) && path.time+d < n
       end.map do |name, d|
-        cost = path.cost + d*path.flow
-        next_flow = path.flow - $valves[name].flow
+        valve = $valves[name]
         time = path.time + d
-        Path.new($valves[name], time: time, cost: cost, flow: next_flow, previous: path)
+        released =  path.released + (n-time)*valve.flow
+        Path.new(valve, time: time, released: released, previous: path)
       end
-      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
-      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
-      # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH,EE"
-      # binding.pry if paths.key == "AA,BB,CC,DD,EE,HH,JJ"
       moves.concat(new_paths)
-      moves = moves.sort_by{|path| path.cost}
+      # moves = moves.sort_by{|path| path.cost}
     end
 
   end
   toc
   $results = deep_dup($visited)
-  $results.values.each do |path|
-    delta = n-path.time
-    path.time = n
-    path.cost += delta*path.flow
-  end
-  $results = $results.values.sort_by{|path| path.cost}
-  $results.first(100)
+  # $results.values.each do |path|
+  #   delta = n-path.time
+  #   path.time = n
+  #   path.cost += delta*path.flow
+  # end
+  $results = $results.values.sort_by{|path| -path.released}
+  $results.first(20)
 end
 
 
 
 class Path
-  attr_accessor :visited, :history, :flow, :valve, :cost, :time, :previous, :history
-  def initialize(valve, cost:, time:, previous:, flow: $starting_flow)
+  attr_accessor :visited, :history, :valve, :released, :time, :previous, :history
+  def initialize(valve, released:, time:, previous:)
     @history = []
-    @flow = flow
     @valve = valve
-    @cost = cost
+    @released = released
     @time = time
     @previous = previous
     @visited = Set.new(previous&.visited)
@@ -127,7 +95,7 @@ class Path
   end
 
   def inspect
-    "<Path:#{object_id} valve: #{valve.name} time: #{time} cost: #{cost} flow: #{flow} history: #{history.join(",")}>"
+    "<Path:#{object_id} valve: #{valve.name} time: #{time} released: #{released} history: #{history.join(",")}>"
   end
 
 end
@@ -149,11 +117,11 @@ $valves.values.each do |valve|
   update_distances(valve)
 end
 
-# explore(30)
+explore(5)
 
 def part1
   result = explore(30)[0]
-  puts "#{$starting_flow*30-result.cost}" # 1786 is too low
+  puts "#{result.released}" # 1786 is too low
 end
 
 # part1

@@ -129,7 +129,12 @@ class Matrix
   end
 
   def inspect
-    "#<Matrix:#{object_id} size=#{self.size}>"
+    prod = self.size.reduce(1) {|total,value| total*value}
+    if prod > 1000
+      "#<Matrix:#{object_id} size=#{self.size}>"
+    else
+      "#<Matrix:#{object_id} array=#{array.inspect}>"
+    end
   end
 
   def method_missing(m, ...)
@@ -239,7 +244,7 @@ end
 
 
 def dd
-  load 'days/day16.rb'
+  load 'days/day17.rb'
 end
 
 def setup(today = Time.now.day)
