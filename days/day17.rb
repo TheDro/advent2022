@@ -39,15 +39,71 @@ $pieces = [
 ]
 
 
+class Stat
+  def initialize
+    @delta_n = {}
+    @delta_height = {}
+    @last_n = {}
+    @last_height = {}
+  end
+
+  # key: direction,piece
+  def add(direction_index:, piece_index:, n:, height:)
+    return if piece_index != 0
+    key = [direction_index, piece_index].join(",")
+
+    @last_n[key] ||= 0
+    last_n = @last_n[key]
+    @delta_n[key] ||= []
+    @delta_n[key] << n-last_n
+    @last_n[key] = n
+
+    @last_height[key] ||= 0
+    last_height = @last_height[key]
+    @delta_height[key] ||= []
+    @delta_height[key] << height-last_height
+    @last_height[key] = height
+
+    if @delta_height[key].size > 2 && @delta_height[key][-1] == @delta_height[key][-2]
+      # binding.pry
+      return [@delta_n[key][-1], @delta_height[key][-1]]
+    else
+      return nil
+    end
+
+  end
+end
+
+
+
 def play(n=1)
-  $cave = Matrix.zeros([30+2*n,7])
+  $cave = Matrix.zeros([10*$directions.length,7])
   $i_dir = 0
   $top_free_row = 0
-  n.times do |i|
-    piece = $pieces[i % $pieces.size]
+  $stats = Stat.new()
+
+  i = 0
+  skip_pattern = false
+  height_offset = 0
+  while i < n do
+    piece_index = i % $pieces.size
+    pattern = $stats.add(direction_index: $i_dir, piece_index: piece_index, n: i, height: $top_free_row) if !skip_pattern
+    if pattern
+      puts pattern.join(",")
+      skip_pattern = true
+      chunks = ((n-i)/pattern[0]).floor-1
+      n_offset = chunks*pattern[0]
+      height_offset = chunks*pattern[1]
+      i += n_offset
+      # binding.pry
+      pattern = nil
+    end
+    # $stats.push([$top_free_row, $i_dir, i % $pieces.size])
+    piece = $pieces[piece_index]
     drop_piece(piece)
+    i += 1
   end
-  $top_free_row
+  $top_free_row + height_offset
 end
 
 def drop_piece(piece)
@@ -90,8 +146,4 @@ def show
   puts $cave.map{|row| row.map{|a| a==0 ? "." : "#"}.join}.reverse.join("\n")
 end
 
-def part1
-  puts play(2022)
-end
 
-part1
