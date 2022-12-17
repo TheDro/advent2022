@@ -19,6 +19,7 @@ def update_distances(starting_valve)
       moves.concat(valve.connections.map do |connection|
         [connection, d+1]
       end)
+      # moves = moves.sort_by{|move| move[1]}
     end
   end
   distances.delete(starting_valve.name)
@@ -42,16 +43,30 @@ def explore(n, valve=$valves["AA"])
 
   moves = [Path.new(valve, cost: 0, time: 0, previous: nil)]
   largest_time = 0
+  lowest_total_cost = $starting_flow*n
+  puts lowest_total_cost
   while !moves.empty? do
     # binding.pry
     path = moves.shift
-    if path.time > n
+    # if path.time > n
+    #   next
+    # end
+    # if path.time > largest_time
+    #   largest_time = path.time
+    #   # puts "time: #{largest_time}"
+    # end
+
+    if path.cost > lowest_total_cost
       next
     end
-    if path.time > largest_time
-      largest_time = path.time
-      puts "time: #{largest_time}"
+
+    next_total_cost = path.cost + (n-path.time)*path.flow
+    if next_total_cost < lowest_total_cost
+      lowest_total_cost = next_total_cost
+      puts $starting_flow*n - lowest_total_cost
     end
+
+    
     # binding.pry if path.history.join(",") == "AA,DD,BB,JJ"
     # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH"
     # binding.pry if path.history.join(",") == "AA,DD,BB,JJ,HH,EE"
@@ -60,7 +75,7 @@ def explore(n, valve=$valves["AA"])
       $visited[path.key] = path
       distances = path.valve.distances
       new_paths = distances.filter do |name, d|
-        !path.visited.include?(name) && path.time+d <= n
+        !path.visited.include?(name) && path.time+d < n
       end.map do |name, d|
         cost = path.cost + d*path.flow
         next_flow = path.flow - $valves[name].flow
@@ -138,7 +153,7 @@ end
 
 def part1
   result = explore(30)[0]
-  puts "#{$starting_flow*30-result.cost}"
+  puts "#{$starting_flow*30-result.cost}" # 1786 is too low
 end
 
 # part1
