@@ -25,3 +25,4 @@ From the root directory, run the day that you want with `crystal i days/dayXX.cr
 - Day 15: ⭐⭐⭐⭐
 - Day 16: ⭐⭐⭐⭐⭐
 - Day 17: ⭐⭐⭐⭐
+- Day 18: ⭐⭐⭐
