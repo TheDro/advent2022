@@ -1,7 +1,7 @@
 load 'common.rb'
 require 'json'
 content = File.read("./days/day18.data")
-content = File.read("./days/day18.test.data")
+# content = File.read("./days/day18.test.data")
 $pieces = parse_data(content, "\n", ",").map{|row| row.map{|v| v.to_i}}
 
 
@@ -38,9 +38,8 @@ def all_directions
 end
 
 
-def group
+def group(pieces=$pieces)
   $chunks = []
-  pieces = deep_dup($pieces)
 
   piece_set = Set.new(pieces)
   while !piece_set.empty? do
@@ -81,9 +80,55 @@ def fill
     end
     boundaries.push([values.min-1, values.max+1])
   end
-  binding.pry
+  
+
+  piece_set = Set.new($pieces)
+  moves = [boundaries.map(&:min)]
+  outside_set = Set.new
+  while !moves.empty? do
+    # binding.pry
+    pos = moves.shift
+    if piece_set.include?(pos) || outside_set.include?(pos)
+      next
+    end
+    outside_set.add(pos)
+
+    all_directions.each do |dir|
+      new_pos = (pos.to_m + dir).to_a
+      if within(new_pos, boundaries)
+        moves.push(new_pos)
+      end
+    end
+  end
+  $outside_set = outside_set
+
+  $new_pieces = []
+  Range.new(*boundaries[0]).each do |i|
+    Range.new(*boundaries[1]).each do |j|
+      Range.new(*boundaries[2]).each do |k|
+        $new_pieces.push([i,j,k]) if !outside_set.include?([i,j,k])
+      end
+    end
+  end
+  $new_pieces
 end
 
+def within(pos, bounds) 
+  pos.size.times do |i|
+    if pos[i] < bounds[i][0] || pos[i] > bounds[i][1]
+      return false
+    end
+  end
+  return true
+end
 
+def part1
+  puts group($pieces)
+end
+
+def part2
+  new_pieces = fill
+  puts group(new_pieces)
+end
 
 
