@@ -1,7 +1,7 @@
 load 'common.rb'
 require 'json'
 content = File.read("./days/day19.data")
-content = File.read("./days/day19.test.data")
+# content = File.read("./days/day19.test.data")
 $blueprints = parse_data(content, "\n").map do |row| 
   match = /Blueprint (\d+): Each ore robot costs (\d+) ore. Each clay robot costs (\d+) ore. Each obsidian robot costs (\d+) ore and (\d+) clay. Each geode robot costs (\d+) ore and (\d+) obsidian./.match(row)
   values = (1..7).map{|i| match[i].to_i}
@@ -48,10 +48,9 @@ def subtract(array1, array2)
 end
 
 
-def play(n)
+def play(n, costs=$blueprints[0])
 
   moves = [$start = Path.new(0, robots: [1,0,0,0], resources: [0,0,0], score: 0, time: 0, previous: nil)]
-  costs = $blueprints[0]
   $visited = {}
 
   iterations = 0
@@ -100,8 +99,7 @@ def play(n)
     end
   end
 
-  results = $visited.sort_by{|key,path| -path.score}.first(20)
-  binding.pry
+  results = $visited.values.sort_by{|path| -path.score}.first(20)
   results
 end
 
@@ -118,3 +116,16 @@ def possible_robots(robots)
   end
   results
 end
+
+
+def part1
+  total = 0
+  $blueprints.size.times do |i|
+    puts "############# STARTING BLUEPRINT #{i}"
+    blueprint = $blueprints[i]
+    total += (i+1) * play(24, blueprint)[0].score
+  end
+  total
+end
+
+puts part1
