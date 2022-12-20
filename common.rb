@@ -244,7 +244,7 @@ end
 
 
 def dd
-  load 'days/day18.rb'
+  load 'days/day16b.rb'
 end
 
 def setup(today = Time.now.day)
