@@ -243,8 +243,8 @@ def parse_data(content, separator1, separator2=nil)
 end
 
 
-def dd
-  load 'days/day19.rb'
+def dd(day=Time.now.day)
+  load "days/day#{day}.rb"
 end
 
 def setup(today = Time.now.day)
