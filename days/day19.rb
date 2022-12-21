@@ -128,4 +128,17 @@ def part1
   total
 end
 
-puts part1
+def part2
+  total = 1
+  $results = []
+  3.times do |i|
+    puts "############# STARTING BLUEPRINT #{i}"
+    blueprint = $blueprints[i]
+    score = play(32, blueprint)[0].score
+    $results << score
+    total = total * score
+  end
+  total
+end
+
+# puts part1
