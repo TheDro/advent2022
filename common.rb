@@ -79,6 +79,20 @@ class Matrix
   def add!(other)
     result = self
 
+    if other.is_a?(Numeric)
+      if self.size.size == 1
+        result.array = result.array.map do |a|
+          a + other
+        end
+      else
+        result.array = result.array.map do |row|
+          row.map do |a|
+            a + other
+          end
+        end
+      end
+    end
+
     if self.size.size == 1
       result.array = result.array.zip(other).map do |a,b|
         a + b
@@ -100,6 +114,20 @@ class Matrix
 
   def subtract!(other)
     result = self
+
+    if other.is_a?(Numeric)
+      if self.size.size == 1
+        result.array = result.array.map do |a|
+          a - other
+        end
+      else
+        result.array = result.array.map do |row|
+          row.map do |a|
+            a - other
+          end
+        end
+      end
+    end
 
     if self.size.size == 1
       result.array = result.array.zip(other).map do |a,b|
@@ -265,11 +293,12 @@ end
 def imagesc(img, number = 0)
   img = img.to_m
   max_value = img.map(&:max).max
-  scale = 255.0/max_value
+  min_value = img.map(&:min).min
+  scale = 255.0/(max_value-min_value)
   png = ChunkyPNG::Image.new(img.size[1], img.size[0], ChunkyPNG::Color::TRANSPARENT)
   img.each_with_index do |row, i|
     row.each_with_index do |value, j|
-      color = (value*scale).round
+      color = ((value-min_value)*scale).round
       png[j,i] = ChunkyPNG::Color.rgba(color, color, color, 255)
     end
   end
