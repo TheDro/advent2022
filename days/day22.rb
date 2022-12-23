@@ -18,6 +18,7 @@ $map.each do |row|
 end
 
 
+
 def show(map: $map, cursor: nil)
   if cursor
     map = deep_dup(map)
