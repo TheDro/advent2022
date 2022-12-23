@@ -181,8 +181,6 @@ class Matrix
     Matrix.new([[1,2,3],[4,5,6]])
   end
 
-  private
-
   def self.same_values(size, value)
     result = nil
     size.reverse.each do |i|
@@ -194,6 +192,10 @@ class Matrix
     end
     Matrix.new(result)
   end
+
+  private
+
+  
 
   def get_indexes(n, size)
     result = []
@@ -222,6 +224,27 @@ module Vectors
             throw :out_of_bounds if cursor.min < 0
             throw :out_of_bounds if (cursor.zip(bounds).map{|a,b| a-b}).max > 0
             y << cursor
+            cursor = cursor.zip(delta).map{|a,b| a+b}
+          end
+        end
+      else
+        loop do
+          y << cursor
+          cursor = cursor.zip(delta).map{|a,b| a+b}
+        end
+      end
+    end
+    result
+  end
+
+  def range_between(first, delta, bounds=nil)
+    result = Enumerator.new do |y|
+      cursor = first.dup
+      if bounds
+        catch :out_of_bounds do
+          loop do
+            y << cursor
+            throw :out_of_bounds if cursor == bounds
             cursor = cursor.zip(delta).map{|a,b| a+b}
           end
         end
@@ -272,6 +295,7 @@ end
 
 
 def dd(day=Time.now.day)
+  day = "22b"
   load "days/day#{day}.rb"
 end
 

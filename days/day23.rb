@@ -16,9 +16,10 @@ $directions = [
 ]
 
 def show(elves = $elves)
-  puts elves.map{|row| row.map do |e|
+  output = elves.map{|row| row.map do |e|
     e == 0 ? "." : e
   end.join(" ")}.join("\n")
+  File.write("whatever.log", output)
 end
 
 
