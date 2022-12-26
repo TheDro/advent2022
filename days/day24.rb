@@ -50,6 +50,8 @@ class Blizzard
   end
 
   def get_spot(pos,time)
+    return 5 if pos.min < 0
+    return 5 if pos[0] >= get_state(time).size[0]
     get_state(time)[pos]
   end
 
@@ -99,10 +101,12 @@ class Path
 end
 
 
-def run(goal = nil)
+def run(start_location = [0,1], goal = [$blizzard.nx+1, $blizzard.ny], start_time = 0)
   directions = [[0,0],[1,0],[0,1],[-1,0],[0,-1]].map(&:to_m)
-  goal ||= [$blizzard.nx+1, $blizzard.ny]
-  start = Path.new([0,1], 0)
+
+  # goal ||= [$blizzard.nx+1, $blizzard.ny]
+  start = Path.new(start_location, start_time)
+
   moves = {}
   moves[start.key] ||= start
 
@@ -157,9 +161,23 @@ def run(goal = nil)
     # binding.pry
   end
   farthest = $visited.sort_by{|k,path| -path.time}
-  binding.pry
+  # binding.pry
   puts "complete at t=#{$result.time}"
+  $result.time
 end
 
+
+def part2
+  start = [0,1]
+  goal = [$blizzard.nx+1, $blizzard.ny]
+
+  time_1 = run(start, goal, 0)
+  time_2 = run(goal, start, time_1)
+  time_3 = run(start, goal, time_2)
+  puts "#{time_1} #{time_2-time_1} #{time_3-time_2} => #{time_3}"
+end
+
+
+
 $blizzard = Blizzard.new($data)
-run
+# run
