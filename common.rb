@@ -295,7 +295,7 @@ end
 
 
 def dd(day=Time.now.day)
-  day = "22b"
+  day = 24
   load "days/day#{day}.rb"
 end
 
