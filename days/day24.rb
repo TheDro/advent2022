@@ -66,8 +66,20 @@ class Blizzard
     
 end
 
-def show(time=0)
-  puts $blizzard.get_state(time).map{|row| row.map{ |e|
+def show(time=0, visited=$visited)
+  state = deep_dup($blizzard.get_state(time))
+  if $visited
+    $visited.each do |key, path|
+      if path.time == time
+        if state[path.pos] == 0
+          state[path.pos] = "."
+        else
+          state[path.pos] = "x"
+        end
+      end
+    end
+  end
+  puts state.map{|row| row.map{ |e|
     {5 => "#", 0 => " "}[e] || e
   }.join()}.join("\n")
 end
@@ -87,12 +99,16 @@ class Path
 end
 
 
-def run()
+def run(goal = nil)
   directions = [[0,0],[1,0],[0,1],[-1,0],[0,-1]].map(&:to_m)
-  goal = [$blizzard.nx+1, $blizzard.ny]
-  moves = [Path.new([0,1].to_m, 0)]
-  move_set = Set.new()
-  move_set << moves[0].key
+  goal ||= [$blizzard.nx+1, $blizzard.ny]
+  start = Path.new([0,1], 0)
+  moves = {}
+  moves[start.key] ||= start
+
+  # moves = [Path.new([0,1].to_m, 0)]
+  # move_set = Set.new()
+  # move_set << moves[0].key
   $result = nil
   $visited = {}
   iterations = 0
@@ -100,23 +116,24 @@ def run()
   $farthest = 0
   while !moves.empty?
     # binding.pry
-    path = moves.shift
+    path = moves.shift[1]
 
     iterations += 1
-    if (iterations % 10000 == 0)
+    if (iterations % 1000 == 0)
       puts "#{iterations} iterations: #{moves.size} moves left. Path: #{path.time} #{path.pos}. Fartest: #{$farthest}"
-      binding.pry
+      # binding.pry
     end
 
     if ($blizzard.get_spot(path.pos, path.time) > 0)
+      binding.pry
       next
     end
     if $visited[path.key] && $visited[path.key].time < path.time
       next
     end
-    if path.pos.sum < $farthest - 4
-      next
-    end
+    # if path.pos.sum < $farthest - 4
+    #   next
+    # end
     
     $visited[path.key] = path
     $farthest = [path.pos.sum, $farthest].max
@@ -125,16 +142,19 @@ def run()
       break
     end
     time = path.time+1
+    # puts path.key
+    # binding.pry
     directions.each_with_index do |direction, i|
       pos = direction + path.pos
       # binding.pry
       next if pos.min < 0
       next if $blizzard.get_spot(pos, time) > 0
       new_path = Path.new(pos.to_a, time)
-      next if move_set.include?(new_path.key)
-      move_set << new_path.key
-      moves << new_path
+      # next if move_set.include?(new_path.key)
+      # move_set << new_path.key
+      moves[new_path.key] = new_path
     end
+    # binding.pry
   end
   farthest = $visited.sort_by{|k,path| -path.time}
   binding.pry
